@@ -79,6 +79,15 @@ class Queue
         front = rear = NULL;
         count = 0;
     }
+    ~Queue()
+    {
+        while(front)
+        {
+            Node* tmp = front;
+            front = front->next;
+            delete tmp;
+        }
+    }
 
     bool is_empty()
     {
@@ -121,8 +130,6 @@ class Queue
         count ++;
         return 0;
     }
-
-
     #endif
     private:
     #ifdef ARRAY
