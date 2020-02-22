@@ -1,0 +1,322 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+
+%==========================Put your name and id here==========================
+\homework{实验报告}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+%\paragraph{Notice}
+%\begin{itemize}
+%    \item The submission email is: \textbf{njuoptfall2019@163.com}.
+%    \item Please use the provided \LaTeX{} file as a template. If you are not familiar with \LaTeX{}, you can also use Word to generate a \textbf{PDF} file.
+%\end{itemize}
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+
+
+
+\paragraph{}
+~\\
+\section{说明}
+    本人在代码中使用了大量的预处理命令。宏LOGGING决定是否启用Log()将提示输出到stdout。在数据抽象中，宏LINKED\_NODE和宏ARRAY决定使用单链表或循环数组作为实现方式。
+\section{过程抽象和封装}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <cstdio>
+    using namespace std;
+    typedef int QUEVAL;
+    
+    
+    #define LOGGING
+    #ifdef LOGGING
+    #define Log(format, ...)\
+        printf("\33[1;35m[%s,%d,%s] " format "\33[0m\n",\
+            __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+    #else
+    #define Log(format, ...)  
+    #endif
+    
+    bool is_empty();
+    bool is_full();
+    int insert(QUEVAL num);
+    int del(QUEVAL &num);
+    
+    
+    const int QUEUE_SZ = 3;
+    int front = 0, rear = 0;
+    bool empty=true, full=false;
+    QUEVAL queue[QUEUE_SZ];
+    
+    
+    int main()
+    {
+        QUEVAL num;
+        del(num);
+        insert(1);
+        insert(1);
+        insert(1);
+        insert(2);
+        del(num);
+        del(num);
+        del(num);
+        del(num);
+    }
+    
+    
+    bool is_empty()
+    {
+        return empty;
+    }
+    
+    bool is_full()
+    {
+        return full;
+    }
+            
+    int insert(QUEVAL num)
+    {
+        if(full)
+        {
+            Log("The queue is full!Insertion failed!");
+            return -1;
+        }
+        else
+        {
+            empty = false;
+            queue[rear] = num;
+            rear = (rear+1)%QUEUE_SZ;
+            if(rear == front) full = true;
+            return 0;
+        }
+    }
+    int del(QUEVAL &num)
+    {
+        if(empty)
+        {
+            Log("The queue is empty!Deletion failed!");
+            return -1;
+        }
+        else
+        {
+            full = false;
+            num = queue[front];
+            front = (front+1)%QUEUE_SZ;
+            if(rear == front) empty = true;
+            return 0;
+        }
+    }
+\end{lstlisting}
+
+
+%If $f$ is a continuous function on some interval $\mathbf{I}$,
+%\begin{enumerate}[a)]
+%    \item Prove that $f$ is a convex function if and only if 
+%\end{enumerate}
+
+\section{数据抽象和封装}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <cstdio>
+    using namespace std;
+    /*使用循环数组和双向链表实现*/
+    /*使用ARRAY LINKED_NODE LOGGING 三个宏进行控制*/
+    //#define ARRAY
+    #define LINKED_NODE 1
+    #define LOGGING
+    
+    
+    #ifdef LOGGING
+    #define Log(format, ...)\
+        printf("\33[1;35m[%s,%d,%s] " format "\33[0m\n",\
+            __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+    #else
+    #define Log(format, ...)  
+    #endif
+    #ifdef ARRAY
+    const int QUEUE_SZ = 100;
+    #elif LINKED_NODE
+    struct Node{
+        int val;
+        Node* next;
+    };
+    #endif
+    
+    class Queue
+    {
+        public:
+        #ifdef ARRAY
+            Queue() 
+            {
+                front=rear=0;
+                empty = true;
+                full = false;
+            }
+            bool is_empty()
+            {
+                return empty;
+            }
+            bool is_full()
+            {
+                return full;
+            }
+            int insert(int num)
+            {
+                if(full)
+                {
+                    Log("The queue is full!Insertion failed!");
+                    return -1;
+                }
+                else
+                {
+                    empty = false;
+                    queue[rear] = num;
+                    rear = (rear+1)%QUEUE_SZ;
+                    if(rear == front) full = true;
+                    return 0;
+                }
+            }
+            int del(int &num)
+            {
+                if(empty)
+                {
+                    Log("The queue is empty!Deletion failed!");
+                    return -1;
+                }
+                else
+                {
+                    full = false;
+                    num = queue[front];
+                    front = (front+1)%QUEUE_SZ;
+                    if(rear == front) empty = true;
+                    return 0;
+                }
+            }
+        #elif LINKED_NODE
+        Queue()
+        {
+            front = rear = NULL;
+            count = 0;
+        }
+        ~Queue()
+        {
+            while(front)
+            {
+                Node* tmp = front;
+                front = front->next;
+                delete tmp;
+            }
+        }
+    
+        bool is_empty()
+        {
+            return !count;
+        }
+    
+        int del(int &num)
+        {
+            if(is_empty())
+            {
+                Log("The queue is empty!Deletion failed!");
+                return -1;           
+            }
+            else
+            {
+                Node * temp = front;
+                front = front->next;
+                num = temp->val;
+                delete temp;
+                count --;
+                return 0;
+            }
+        }
+    
+        int insert(int num)
+        {
+            if(!is_empty())
+            {
+                rear->next = new Node;
+                rear = rear->next;
+                rear->val = num;
+                rear->next = NULL;
+            }
+            else
+            {
+                rear = front = new Node;
+                rear ->val = num;
+                rear ->next = NULL;
+            }
+            count ++;
+            return 0;
+        }
+        #endif
+        private:
+        #ifdef ARRAY
+            int front, rear;
+            int queue[QUEUE_SZ];
+            bool full,empty;
+        #elif LINKED_NODE
+            Node *front, *rear;
+            int count;
+        #endif
+    };
+    
+    int main()
+    {
+        Queue my_queue;
+        int num;
+        my_queue.del(num);
+        my_queue.insert(1);
+        my_queue.insert(1);
+        my_queue.insert(1);
+        my_queue.insert(1);
+        my_queue.del(num);
+        my_queue.del(num);
+        my_queue.del(num);
+        my_queue.del(num);
+        my_queue.del(num);
+    }   
+\end{lstlisting}
+\section{数据抽象和封装的优点}
+    相比过程抽象，数据抽象将front，rear等指示循环数组头尾的重要信息封装了起来，数据与功能联系紧密，防止无关的外部函数对其进行操作，避免了可能存在的函数副作用对数据的影响。而过程抽象的实现将front与rear定义为全局变量，数据与功能联系松散，一方面让模块的划分更加模糊，另一方面也造成了潜在的在未来编写其他函数或变量时，因强符号、弱符号的区别造成意想不到的符号重定义、语义与实际链接对象不符等链接错误。
+
+
+\end{document}

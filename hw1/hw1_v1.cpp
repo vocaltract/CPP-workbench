@@ -39,9 +39,6 @@ int main()
 }
 
 
-
-
-
 bool is_empty()
 {
     return empty;
