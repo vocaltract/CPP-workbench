@@ -1,0 +1,65 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+% \usepackage{ctex}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+%==========================Put your name and id here==========================
+\homework{实验报告}{2020 春}{陈家骏}{王晨渊}{181220057}
+
+%\paragraph{Notice}
+%\begin{itemize}
+%    \item The submission email is: \textbf{njuoptfall2019@163.com}.
+%    \item Please use the provided \LaTeX{} file as a template. If you are not familiar with \LaTeX{}, you can also use Word to generate a \textbf{PDF} file.
+%\end{itemize}
+
+\paragraph{问题一}
+~\\
+If $f$ is a continuous function on some interval $\mathbf{I}$,
+\begin{enumerate}[a)]
+    \item Prove that $f$ is a convex function if and only if $\forall x_1,x_2\in\mathbf{I}$,
+    \begin{equation}\label{equa:1}
+    f\left(\frac{x_1+x_2}{2}\right)\leq \frac{1}{2}[f(x_1)+f(x_2)].
+    \end{equation}
+    \item Prove that $f(x)=e^x$ is a convex function.
+    \item If $m,n>0,p>1$ and $1/p+1/q=1$, prove that $mn\leq\frac{m^p}{p}+\frac{n^q}{q}.$
+\end{enumerate}
+
+
+\end{document}
