@@ -1,0 +1,382 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill \bf #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newcommand{\yahei}{\setCJKfamilyfont{yahei}{Microsoft YaHei} \CJKfamily{yahei}}
+
+
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+%大标题在这里改！！！！！！！！！
+\homework{实验报告}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+
+\section{概念题}
+\subsection{请说出C++中同类对象共享数据的两种方式，并比较它们的优缺点。}
+一种方法是使用全局变量存储共享数据。优点在于使用自由，书写简便。缺点在于缺少对数据的保护，由于其不受类的访问控制的限制，任何类的对象都可以自由的访问或修改。
+
+另一种方法是使用静态数据成员和静态成员函数。优点是在实现数据共享的同时，一方面使其收到类的访问控制的限制，提高数据的安全性，另一方面静态数据成员对该类的所有对象仅存在一个拷贝，节省了内存使用。缺点在于使用时要遵循繁琐的访问控制规范，代码不够简洁。
+
+
+
+
+\subsection{下面对静态数据成员的描述中，正确的是(B)}
+A. 静态数据成员不可以通过类的对象调用
+
+B. 静态数据成员可以在类体内进行初始化
+
+C. 静态数据成员不能受private(私有)控制符的作用
+
+D. 静态数据成员可以直接通过类名调用
+\subsection{已知类A是类B的友元，类B是类C的友元，则(C)}
+A. 类A一定是类C的友元
+
+B. 类C一定是类A的友元
+
+C. 类C的成员函数可以访问类B的对象的任何成员
+
+D. 类A的成员函数可以访问类B的对象的任何成员
+\subsection{简述C++中的迪米特法则(Law Of Demeter)，遵循迪米特法则设计的模块具有哪些优点？}
+    一个类的成员函数除了能访问自身类结构的直接子结构（表层子结构）外，不能以任何方式依赖于任何其他类的结构；并且每个成员函数只应向某个有限集合中的对象发送信息。
+    
+    对于类C中的任何成员函数M，M中能直接访问或引用的对象必须属于下述类之一：
+
+    1)类C本身
+    
+    2)成员函数M的参数类
+
+    3)M或M所调用的成员函数所创建的对象类
+
+    4)全局对象所属的类
+    
+    5)类C的成员对象所属的类
+
+    好处在于可以降低模块间的耦合度和成员函数对环境的依赖性。
+
+
+
+
+\section{编程题}
+\subsection{Array类和Matrix类}
+\begin{lstlisting}[language={[ANSI]C++}]
+
+    class Array
+    {
+    public:
+        Array(int length, int column)
+            : len(length), col(column)
+        {
+            array = new double[length];
+        }
+        Array(int length, int column, double origin[], int origin_len)
+            : len(length), col(column)
+        {
+            array = new double[length];
+            for (int i = 0; i < len; i++)
+            {
+                if (i < origin_len)
+                {
+                    array[i] = origin[i];
+                }
+                else
+                {
+                    array[i] = 0;
+                }
+            }
+        }
+        inline double loc(int x, int y) const
+        {
+            return array[x * col + y];
+        }
+        inline double get(int x) const
+        {
+            return array[x];
+        }
+    
+        inline int get_col() const
+        {
+            return col;
+        }
+        inline int get_row() const
+        {
+            return len / col;
+        }
+        inline int get_len() const
+        {
+            return len;
+        }
+        inline void swap()
+        {
+            for (int i = 0; i < len; i++)
+            {
+                array[i] = -array[i];
+            }
+        }
+        inline void output() const
+        {
+            for (int i = 0; i < len; i++)
+            {
+                if (i % col == col - 1)
+                {
+                    cout << array[i] << ",\n";
+                }
+                else
+                {
+                    cout << array[i] << ",";
+                }
+            }
+        }
+        Array(const Array &a)
+        {
+            len = a.get_len();
+            col = a.get_col();
+            array = new double[len];
+            for (int i = 0; i < len; i++)
+            {
+                array[i] = a.get(i);
+            }
+        }
+        ~Array()
+        {
+            delete[] array;
+        }
+    
+    private:
+        int len;
+        int col;
+        double *array;
+    };
+    
+    class Matrix
+    {
+    public:
+        Matrix(int this_row, int this_col, double origin[], int origin_len)
+            : row(this_row),
+              col(this_col),
+              arr(row * col, col, origin, origin_len)
+        {
+        }
+        Matrix(const Matrix &a)
+            : row(a.get_row()),
+              col(a.get_col()),
+              arr(a.arr)
+        {
+            arr.swap();
+        }
+        inline int get_col() const
+        {
+            return col;
+        }
+        inline int get_row() const
+        {
+            return row;
+        }
+        inline void output() const
+        {
+            arr.output();
+        }
+    
+    private:
+        int row, col;
+        Array arr;
+    };    
+ \end{lstlisting}
+ \subsection{String类及其拼接函数}
+\begin{lstlisting}[language={[ANSI]C++}]
+    class String
+    {
+    public:
+        String(char* s)
+        {
+            if(s)
+            {
+                len = strlen(s);
+                str = new char[len+1];
+                strcpy(str,s);
+            }
+            else
+            {
+                len = 0;
+                str = NULL;
+            }
+        }
+        String(const String& s)
+        {
+            len = s.get_len();
+            set(s.get_str());
+        }
+        int get_len() const
+        {
+            return len;
+        }
+        char* get_str() const
+        {
+            return str;
+        }
+        bool is_NULL() const
+        {
+            return len==0;
+        }
+        
+        void set(char* s)
+        {
+            if(s)
+            {
+                delete[] str;            
+            }
+            int s_len = strlen(s);
+            str = new char[s_len+1];
+            strcpy(str,s);
+        }
+        void clear()
+        {
+            delete[] str;
+            str = NULL;
+        }
+    
+        static int mystrcat(const String& str1, const String& str2, String& str3)
+        {
+            if(str1.is_NULL()&&str2.is_NULL())
+            {
+                cerr<<"Both are NULL\n";
+                return 0;
+            }
+            else if(str1.is_NULL())
+            {
+                str3.set(str2.get_str());
+                return strlen(str2.get_str());       
+            }
+            else if(str2.is_NULL())
+            {
+                str3.set(str1.get_str());
+                return strlen(str1.get_str());  
+            }
+            else
+            {
+                int new_s_len = str1.get_len()+str2.get_len();
+                char* new_s = new char[new_s_len+1];
+                strcpy(new_s,str1.get_str());
+                strcpy(&new_s[str1.get_len()],str2.get_str());
+                str3.set(new_s);
+                delete new_s;
+                return strlen(new_s);          
+            }
+        }
+        void output()
+        {
+            cout<<str<<endl;
+        }
+        ~String()
+        {
+            delete[] str;
+            str = NULL;
+            len = 0;
+        }
+    private:
+        char* str;
+        int len;
+    };
+\end{lstlisting}
+\subsection{Single类}
+    规定只能通过Single::creat\_obj()和Single::del\_obj()两个函数来创建或消亡Single类对象。
+    \begin{lstlisting}[language={[ANSI]C++}]
+        class Single
+        {
+        public:
+            static Single* create_obj();
+            static void del_obj();
+            Single()
+            {
+                count_object++;
+                
+            }
+            ~Single()
+            {
+                count_object--;
+            }
+        
+        private:
+            static int get_count_obj()
+            {
+                return count_object;
+            }
+            static int count_object;
+            static Single* the_only;
+        };
+        int Single::count_object = 0;
+        Single* Single::the_only = NULL;
+        Single* Single::create_obj()
+        {
+            if(Single::get_count_obj())
+            {
+                cerr<<"Object Creation Failed!"<<endl;
+            }
+            else
+            {
+                Single::the_only = new Single;
+                Single::count_object++;
+                
+            }
+            return Single::the_only;
+            
+        }
+        void Single::del_obj()
+        {
+            if(Single::get_count_obj())
+            {
+                Single::count_object--;
+                delete Single::the_only;
+                Single::the_only = NULL;
+            }
+            else
+            {
+                cerr<<"There is no object!"<<endl;
+            }
+        }
+    \end{lstlisting}
+\end{document}
