@@ -1,17 +1,22 @@
-CUR_DIR  = $(shell pwd)
-VPATH = $(CUR_DIR)/src
-OBJS = main.o Block.o tools.o
-INCLUDE = -I $(CUR_DIR)/include 
-NAME = ./build/snaker.out
-CC = g++
-CFLAGS = -ggdb $(INCLUDE) -static -o1 -o $(NAME) 
+SRCS := $(wildcard src/*.cpp)
+OBJS := $(notdir $(SRCS:.cpp=.o))
+INCLUDE := ./include
+COMPILE_FLAGS := -I $(INCLUDE) -c 
+OBJ_DIR = ./build
+CXXFLAGS = -ggdb -static
+CXX = g++ 
+#$(OBJS): $(SRCS)
+#	$(CXX) $(COMPILE_FLAGS) $(SRCS) -o $@
 
-ALL:$(OBJS)
-	$(CC) $(CFLAGS) $(OBJS)
-
-tools.o: include/tools.h
-Block.o: include/Block.h
+build/snaker.out:
+	for name in `echo $(SRCS) | sed s/.cpp//g`;\
+	do $(CXX) $(COMPILE_FLAGS) "$$name".cpp;done  
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
 
 .PHONY:clean
 clean:
-	rm -rf $(OBJS) 
+	rm *.o
+	rm build/snaker.out
+
+
+

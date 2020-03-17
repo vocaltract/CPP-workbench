@@ -1,4 +1,4 @@
-#include "../include/tools.h"
+#include <tools.h>
 int main()
 {
     Vector2D a(1,2), b(3,5);

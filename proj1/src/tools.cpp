@@ -1,4 +1,4 @@
-#include "../include/tools.h"
+#include <tools.h>
 Vector2D::Vector2D()
 {
     x = 0;
