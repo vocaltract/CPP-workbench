@@ -1,10 +1,8 @@
-#include <tools.h>
+#include "Screen.h"
+#include <ctime>
 int main()
 {
-    Vector2D a(1,2), b(3,5);
-    Vector2D c = b;
-    Vector2D d;
-    d = a - b;
-    d.display();
-    c.display();
+    srand(time(0));
+    Screen my_screen;
+    my_screen.output();
 }

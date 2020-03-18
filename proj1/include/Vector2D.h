@@ -1,4 +1,4 @@
-# include <iostream>
+#include <iostream>
 class Vector2D
 {
 public:
@@ -9,8 +9,14 @@ public:
     Vector2D();
     Vector2D(int x_loc, int y_loc);
     Vector2D(const Vector2D& vector);
+    int get_x() const;
+    int get_y() const;
     void display() const;
     void set(int x_loc, int y_loc);
+    void inc_x(int delta);
+    void dec_x(int delta);
+    void inc_y(int delta);
+    void dec_y(int delta);
 private:
     int x;
     int y;
