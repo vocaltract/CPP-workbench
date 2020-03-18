@@ -1,0 +1,279 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill \bf #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newcommand{\yahei}{\setCJKfamilyfont{yahei}{Microsoft YaHei} \CJKfamily{yahei}}
+
+
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+%大标题在这里改！！！！！！！！！
+\homework{实验报告}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+
+\section{概念题}
+\subsection{C++中操作符的重载遵循哪些基本原则？}
+只能重载C++语言中已有的操作符，不可臆造新的操作符
+
+可以重载C++中除. .* ?: :: sizeof 外的所有操作符
+
+需要遵循已有操作符的语法，一方面不能改变操作数的个数，另一方面不能改变原操作符的优先级和结合性。
+
+尽量遵循已有操作符原来的语义。语言本身没有对此做任何规定，使用者需要自己把握。
+
+\subsection{简述单目运算符(++，--)前置重载和后置重载的差别。}
+
+如果不做特殊处理，前置和后置共用同一个重载函数，但失去了原先的语义。
+
+前置为左值表达式，后置为右值表达式。
+
+因此，定义前置的自增（自减）操作符时，函数原型为
+
+<返回值类型> operator \#(); 其中返回值为引用类型。
+
+定义后置的自增（自减）操作符时，函数原型为
+
+<返回值类型> operator \#(int); 其中返回值为常量类型。
+
+
+
+
+\section{编程题}
+\subsection{修改原程序}
+原程序不能正常运行。
+
+由于在类中没有显式地重载=操作符，a2=a1调用的是C++为其创建的隐式默认重载函数，默认将a1的所有成员原样赋值给a2。这样a2.p和a1.p指向了相同的内存空间。当a1或a2其中一个消亡，另一个没有消亡的时候，没有消亡的对象对于p指向的内容的访问会出现问题。并且a1和a2都消亡时，
+指向的空间被释放两次引发报错。
+
+应该将其修改为以下内容。
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <iostream>
+    using namespace std;
+    class A
+    {
+    public:
+        int x;
+        int *p;
+        A()
+        {
+            p = new int(0);
+            x = 0;
+        }
+    
+        A& operator = (const A& a)
+        {
+            if(&a==this) return *this;
+            x = a.x;
+            delete p;
+            p = new int(*a.p);
+            return *this;
+        }
+    
+        A& operator =(A&& a)
+        {
+            if(&a == this) return *this;
+            x = a.x;
+            delete p;
+            p = new int(*a.p);
+            a.p = NULL;
+            return *this;
+        }
+    
+        A(int m, int n)
+        {
+            p = new int(n);
+            x = m;
+        }
+        ~A()
+        {
+            delete p;
+            x = 0;
+        }
+    
+    
+    };
+    
+    int main()
+    {
+        A a1(6, 8);
+        A a2;
+        a2 = a1;
+        cout << "a1.x = " << a1.x << ", "
+             << "*(a1.p) = " << *(a1.p) << endl;
+        cout << "a2.x = " << a2.x << ", "
+             << "*(a2.p) = " << *(a2.p) << endl;
+        cout << "a1.p = " << a1.p << endl;
+        cout << "a2.p = " << a2.p << endl;
+        return 0;
+    }
+ \end{lstlisting}
+ \subsection{设计一个日期类Date}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <atltime.h>
+    #include <iostream>
+    class Date
+    {
+    public:
+        friend Date operator+(const Date& date, int day);
+        friend Date operator-(const Date& date, int day);
+        Date()
+        {
+            cur = CTime::GetCurrentTime();
+        }
+        Date(const CTime& date)
+        {
+            cur = date;
+        }
+        Date(int year, int month, int day)
+            :cur(year,month,day,0,0,0)
+        {
+        }
+    
+        Date& operator =(const Date& another)
+        {
+            if (&another == this) return *this;
+            cur = another.cur;
+            return *this;
+        }
+        Date& operator++()
+        {
+            cur += one_day;
+            return *this;
+        }
+        const Date operator++(int)
+        {
+            cur += one_day;
+            return *this;
+        }
+        Date& operator--()
+        {
+            cur -= one_day;
+            return *this;
+        }
+        const Date operator--(int)
+        {
+            cur -= one_day;
+            return *this;
+        }
+        int operator-(const Date& another)
+        {
+            return (cur - another.cur).GetDays();
+        }
+    
+        void output() const
+        {
+            std::cout<<cur.GetYear()<<"-"<<cur.GetMonth()<<"-"<<cur.GetDay()<<"\n";
+        }
+    private:
+        CTime cur;
+        static CTimeSpan one_day;
+    };
+    CTimeSpan Date::one_day(1, 0, 0, 0);
+    
+    Date operator+(const Date& date, int day)
+    {
+        CTimeSpan add_days(day, 0, 0, 0);
+        CTime new_cdate(date.cur);
+        new_cdate += add_days;
+        Date new_date(new_cdate);
+        return new_date;
+    }
+    Date operator-(const Date& date, int day)
+    {
+        CTimeSpan add_days(day, 0, 0, 0);
+        CTime new_cdate(date.cur);
+        new_cdate -= add_days;
+        Date new_date(new_cdate);
+        return new_date;
+    }
+    
+    
+\end{lstlisting}
+\subsection{不会越界的String类}
+    \begin{lstlisting}[language={[ANSI]C++}]
+        #include<iostream>
+        #include<cstring>
+        class String
+        {
+        
+        public:
+            String()
+            {
+                str=NULL;
+                str_len = 0;
+            }
+            String(char* s)
+            {
+                str_len =strlen(s); 
+                str = new char[str_len+1];
+                strcpy(str,s);
+            }
+            char& operator[](int i)
+            {
+                return i>=str_len?str[str_len-1]:str[i];   
+            }
+            String& operator=(const String& s)
+            {
+                if(&s==this) return *this;
+                delete[] str;
+                str_len = s.str_len;
+                str = new char[str_len+1];
+                strcpy(str,s.str);
+                return *this;
+            }
+            ~String()
+            {
+                if(!str_len) delete[] str;
+            }
+        private:
+            char* str;
+            int str_len;
+        };
+\end{lstlisting}
+
+\end{document}
