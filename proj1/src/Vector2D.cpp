@@ -63,6 +63,7 @@ void Vector2D::inc_x(int delta)
 {
     x += delta;
 }
+
 void Vector2D::dec_x(int delta)
 {
     x-=delta;
@@ -83,3 +84,31 @@ int Vector2D::get_y() const
 {
     return y;
 }
+
+Vector2D Vector2D::x_inc_vec(int delta) const
+{
+    Vector2D temp = *this;
+    temp.inc_x(delta);
+    return temp;
+}
+Vector2D Vector2D::x_dec_vec(int delta) const
+{
+    Vector2D temp = *this;
+    temp.dec_x(delta);
+    return temp;
+}
+Vector2D Vector2D::y_inc_vec(int delta) const
+{
+    Vector2D temp = *this;
+    temp.inc_y(delta);
+    return temp;
+}
+Vector2D Vector2D::y_dec_vec(int delta) const
+{
+    Vector2D temp = *this;
+    temp.dec_y(delta);
+    return temp;
+}
+
+
+

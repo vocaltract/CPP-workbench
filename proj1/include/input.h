@@ -1,4 +1,5 @@
 # include <iostream>
+
 #define KEY_W 0b01010111
 #define KEY_A 0b01000001
 #define KEY_S 0b01010011
@@ -10,3 +11,4 @@
 #include <termios.h>
 #include <unistd.h>
 char getch(void);
+#define DELAY 500000

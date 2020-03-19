@@ -28,3 +28,8 @@ void Block::output()
 {
     std::cout<<appearing;
 }
+
+Vector2D& Block::get_vector()
+{
+    return loc;
+}

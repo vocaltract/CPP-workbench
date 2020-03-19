@@ -6,6 +6,7 @@ class Block
 public:
     Block();
     Block(int x_loc, int y_loc, string another=" ");
+    Vector2D& get_vector();
     void up();
     void down();
     void left();
