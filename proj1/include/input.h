@@ -11,4 +11,6 @@
 #include <termios.h>
 #include <unistd.h>
 char getch(void);
-#define DELAY 500000
+#define DELAY 250000
+#define abs(x) ((x>=0)?(x):(-x))
+#define FOODDELAY 30

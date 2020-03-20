@@ -11,9 +11,11 @@ public:
     string get_appearing(const Vector2D& loc) const;
     Block& get_block(const Vector2D& loc);
     void input();
-    void update();
+    bool update();
     void screen_clear();
     void update_with_snake(const Snake& snake);
+    bool produce_timefood();
+    bool delete_timefood();
 private:
     Snake snake;
     int width;
@@ -24,4 +26,8 @@ private:
     Block blocks[LEN][WIDTH];
     Vector2D food_loc;
     void randfood();
+    clock_t last_time;
+    Vector2D timefood_loc;
+    bool has_timefood;
+    bool timefood_eaten;
 };

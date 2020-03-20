@@ -3,6 +3,7 @@ class Vector2D
 {
 public:
     Vector2D& operator = (const Vector2D& vector);
+    bool operator == (const Vector2D& vector);
     Vector2D operator + (const Vector2D& a) const;
     Vector2D operator - (const Vector2D& a) const;
     Vector2D operator - () const;

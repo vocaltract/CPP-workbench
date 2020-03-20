@@ -4,18 +4,12 @@ int main()
     srand(time(0));
     Screen my_screen;
     my_screen.output();
-    while(1)
+    bool game_continue=true;
+    while(game_continue)
     {
         my_screen.input();
-        my_screen.update();
+        game_continue = my_screen.update();
         my_screen.screen_clear();
         my_screen.output();
-
     }
-
-
-    
-    
-    
-    
 }

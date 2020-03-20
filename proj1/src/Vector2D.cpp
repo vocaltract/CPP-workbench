@@ -48,7 +48,10 @@ Vector2D& Vector2D::operator = (const Vector2D& vector)
     return *this;
 }
 
-
+bool Vector2D::operator == (const Vector2D& vector)
+{
+    return x==vector.x && y == vector.y;
+}
 void Vector2D::display() const
 {
     std::cout<<'('<<x<<','<<y<<')'<<std::endl;
