@@ -1,5 +1,5 @@
 #include "Screen.h"
-#define DEBUG
+//#define DEBUG
 #include "input.h"
 #include "debug.h"
 Screen::Screen()

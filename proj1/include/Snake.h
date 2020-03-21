@@ -1,5 +1,5 @@
 #include "Block.h"
-#define MAX_SNAKE_LEN 40
+#define MAX_SNAKE_LEN 100
 class Snake
 {
 public:

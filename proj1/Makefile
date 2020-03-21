@@ -5,11 +5,6 @@ COMPILE_FLAGS := -I $(INCLUDE) -ggdb -c
 OBJ_DIR = ./build
 CXXFLAGS = -static -o0
 CXX = g++ 
-#build/snaker.out:$(SRCS)
-#	for name in `echo $(SRCS) | sed s/.cpp//g`;\
-	do $(CXX) $(COMPILE_FLAGS) "$$name".cpp;done  
-#	$(CXX) $(CXXFLAGS) Vector2D.o Block.o Snake.o output.o Screen.o main.o -o $@
-#	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
 
 build/snaker.out:$(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
@@ -30,7 +25,7 @@ main.o:src/main.cpp
 
 .PHONY:clean
 clean:
-	rm *.o
+	rm *.o *.out *.aux *.log *.synctex.gz
 	rm build/snaker.out
 .PHONY:run
 run:build/snaker.out

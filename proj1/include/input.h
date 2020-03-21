@@ -13,4 +13,4 @@
 char getch(void);
 #define DELAY 250000
 #define abs(x) ((x>=0)?(x):(-x))
-#define FOODDELAY 30
+#define FOODDELAY 8

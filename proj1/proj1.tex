@@ -1,0 +1,153 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill \bf #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newcommand{\yahei}{\setCJKfamilyfont{yahei}{Microsoft YaHei} \CJKfamily{yahei}}
+
+
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+%大标题在这里改！！！！！！！！！
+\homework{课程设计报告}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+
+\section{设计思路}
+\subsection{主题与规则}
+    我选取了贪吃蛇作为本次课程设计的主题。
+    本人贪吃蛇的规则如下:
+
+\subsubsection{控制}
+    利用WASD控制上下左右。注意，蛇本身会朝着上一次按键决定的方向不断移动。另外，如果蛇在向某个方向运动时，有效的方向控制仅为该方向的左右两个方向，如果按下另外两个方向，一个会加速，一个会识别为会加速的方向。举个例子，如果蛇正在朝下移动，如果按A或D，蛇会正常地左转或右转，如果按下S，蛇会发生加速移动，如果按下W，W会被识别为S而导致蛇向下加速移动。
+\subsubsection{食物}
+    开始游戏后会立刻出现一个非计时食物。吃掉该食物后会立刻重新刷新。
+    开始游戏后8秒，会生成一个计时食物。如果在八秒内吃掉，计时食物会在计时食物出现的时刻加八秒后刷新。如果没有在八秒内吃掉，计时食物会在出现的时刻加八秒后重新刷新在其他位置。
+
+\subsubsection{游戏结束}
+    贪吃蛇碰到四周的围墙或碰到自己的身体后判定为游戏结束或长度达到102个单位时，游戏结束。随后屏幕会输出分数
+
+\subsubsection{计分规则}
+    每吃到一个食物加1分。
+
+\subsection{头文件中几个参数说明}
+    在Snake.h中，MAX\_SNAKE\_LEN宏指出了蛇的最大长度
+    
+    在Screen.h中，LEN和WIDTH宏指出屏幕的长（竖起来的）和宽（横过来的）。
+
+    在input.h中，DELAY指出了输入的等待时间，单位为$10^{-6}$秒。FOODDELAY指出了计时食物刷新的等待时间，单位为秒。KEY\_W等宏代表了键盘获得的char,指出获取的内容。
+
+
+\section{工程使用说明}
+    平台:Ubuntu 18.04
+    
+    编译器:g++ 7.5.0
+    
+    make在工程目录下生成*.o文件，在build目录下生成snaker.out可执行文件。
+    
+
+
+\subsection{对象划分}
+    由于贪吃蛇需要通过串口输出基本图案，它天然地就适合用某个对象来描述每个像素。
+    
+\subsubsection{Vector2D类}
+    我利用操作符重载等技术，实现了一个二维向量类，用于描述像素点的位置。
+
+\subsubsection{Block类}
+    成员为一个string类对象和一个Vector2D类对象，用于描述像素点的形状与位置。
+
+\subsubsection{Snake类}
+    成员对象包含一个Vector2D数组，用于描述蛇的位置。用两个int型变量描述和限制蛇的长度。
+
+\subsubsection{Screen类}
+    包含了Block类对象二位数组，Snake类对象和其他用于控制的变量，包括两种食物的位置，食物是否被吃掉等等。
+    
+    值得注意的是，作为画板的blocks，x轴正方向为竖直向下，y轴正方向为水平向右。
+
+\subsection{代码执行的流程}
+        
+
+    首先srand(time(0))初始化随机种子。
+    
+    初始化一个Screen类对象，my\_screen。此时myscreen内部已初始化完成了blocks大数组中的元素，一方面画好了屏幕的四条边、食物和蛇，另外一方面也初始化好了一些控制变量。
+    
+    my\_screen.output()打印目前blocks中的所有内容。
+    
+    my\_screen.input()获得键盘输入，规则如下：
+
+    如果给定时间内没有有效输入（即WASD），输入按上一次计。如果输入与上一次的输入相冲突，如A-D，W-S pair就是冲突的输入，按上一次输入计。
+
+    my\_screen.update() 检测是否吃到食物，从而调用snake.update()更新蛇的状态，同时判断输赢。此外，该函数还对计时食物进行检测，如果计时食物被吃掉了，会删掉并重新生成计时食物，由delete和producetimefood这两个函数负责。对于普通食物也有类似更新机制，由randfood函数负责。此外，snake.update更新的是Snake的状态，并没有更新到画板blocks上，函数中调用的update\_with\_snake函数才真正把snake的新状态更新到了blocks上。最后，返回bool值表示游戏是否结束。
+
+    此后，my\_screen.screen\_clear()将上一次输出到屏幕的内容清除。
+
+    my\_screen.output，将更新后的画板重新打印出来；如果游戏结束，则输出得分。
+
+    执行上述循环直到游戏结束。
+
+\section{实现过程中遭遇的问题}
+\subsection{编译}
+文件众多导致编译麻烦，我自学了makefile通过make工具解决了这个问题。
+\subsection{include麻烦}
+include头文件时，需要写成\#include"./include/*.h"需要多写地址，非常烦。因此我查询了g++的手册，了解了-I选项，从而解决了这个问题。
+
+
+\subsection{输出计时的麻烦}
+
+    我想要实现一个很短时间内若没有获得输入，则贪吃蛇执行上一个输入的动作的功能。但是由于一方面Linux上没有conio等库，唯一可以用的getchar()回显、对象按行且阻塞，导致无法计时。因此我结合网络信息，查阅了termios的手册，在input.cpp中实现了符合我要求的不回显、不阻塞且只读取一个char的getch()
+
+
+\section{需要改进之处}
+    由于有很多DDL要赶，很多地方没有来得及优化，在此指出。
+\subsection{Block类的改进}
+
+    Block类的抽象不科学，更好的办法是把Block类设为一个动态二位数组，每个元素都是对应像素的图案。因为二位数组的索引已经天然地包含了坐标信息，无需再使用大量的Vector2D浪费存储空间。事实上，Block类的Vector2D几乎从未被使用。
+\subsection{输入Key的改进}
+    一方面，设定对应的宏并没有在事实上简化代码编写（虽然提高了代码的可读性），值得探索更好的方案。
+    另一方面，应当对应Keymapping编写一些功能函数，以减少大量的代码冗余。可以发现，在Screen.cpp中，由于输入按键的判断问题，造成了丑陋而冗长的if语句。应该编写判断输入是否为WASD，判断输入是否和上一次输入冲突如A-D，W-S等等的判断函数，可以有效减少冗长的if语句。
+
+
+\end{document}
