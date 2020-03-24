@@ -1,0 +1,166 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill \bf #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newcommand{\yahei}{\setCJKfamilyfont{yahei}{Microsoft YaHei} \CJKfamily{yahei}}
+
+
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+%大标题在这里改！！！！！！！！！
+\homework{实验报告}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+
+\section{概念题}
+\subsection{C++中Lambda表达式的语法形式是怎样的？Lambda表达式有什么优点？}
+用BNF可以写为
+
+[<环境变量使用说明>] <形式参数> <返回值类型指定> <函数体>
+
+优点在于可以将函数的定义与声明合二为一，同时减少了标识符的使用，为程序的编写带来便利。
+
+\subsection{ C++中类成员访问运算符 -> 可以用于实现"智能指针"的功能。与正常指针相比，"智能指针"有哪些特点？}
+
+    智能指针可以对堆区上的动态对象进行计数，当所有的指针都不指向某个动态对象时，这个对象可以被自动释放，从而使得程序员无需手动管理内存，大幅改善程序内存泄漏问题。
+
+    此外，程序员可以自定义智能指针类进行一些其他操作。
+
+\section{编程题}
+\subsection{斐波那契数列}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <cassert>
+    class Fib
+    {
+    public:
+        Fib(int index);
+        Fib();
+        int operator()();
+    private:
+        int last;
+        int cur;
+    
+    };
+
+    Fib::Fib(int index)
+    {
+        assert(index >= 1);
+        last = 0;
+        cur = 1;
+        for (int i = 1; i < index; i++)
+        {
+            int temp = last + cur;
+            last = cur;
+            cur = temp;
+        }
+    }
+    
+    Fib::Fib()
+    {
+        last = 0;
+        cur = 1;
+    }
+    
+    int Fib::operator()()
+    {
+        int temp = last + cur;
+        last = cur;
+        cur = temp;
+        return cur;
+    }
+ \end{lstlisting}
+ \subsection{代码填空}
+\begin{lstlisting}[language={[ANSI]C++}]
+    struct Point
+    {
+        int x;
+        int y;
+    };
+    
+    bool IsTrue(Point &rstCenter, int iRadius, Point &P1, Point &P2)
+    {
+        auto PointInCircle = [rstCenter,iRadius](Point point)->bool
+        {   
+            return (point.x-rstCenter.x)*( point.x-rstCenter.x)+(point.y-rstCenter.y)*( point.y-rstCenter.y)<iRadius;
+        };
+        return PointInCircle(P1) != PointInCircle(P2);
+    }    
+\end{lstlisting}
+\subsection{智能指针类}
+    \begin{lstlisting}[language={[ANSI]C++}]
+        class B
+        {
+        public:
+            B(A* p);
+            string string_access() const;
+            A* operator->();
+        private:
+            string last_time;
+            A* p_a;
+        };
+        
+        B::B(A* p)
+        {
+            last_time = "No Access!";
+            p_a = p;
+        }
+        
+        string B::string_access() const
+        {
+            return last_time;
+        }
+        
+        A* B::operator->()
+        {
+            time_t now_time=time(NULL);
+            last_time =asctime(localtime(&now_time));
+            return p_a;
+        }
+                
+\end{lstlisting}
+
+\end{document}
