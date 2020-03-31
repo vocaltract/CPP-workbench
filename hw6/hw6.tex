@@ -1,0 +1,268 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill \bf #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newcommand{\yahei}{\setCJKfamilyfont{yahei}{Microsoft YaHei} \CJKfamily{yahei}}
+
+
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+%大标题在这里改！！！！！！！！！
+\homework{实验报告}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+
+\section{概念题}
+\subsection{简述C++中继承的概念，并说明继承有哪些优点。}
+在定义一个新的类时，将某个或某些已有类的所有特征包含进来，然后在新的类中再定义新的特征或对已包含的特征进行重定义（修改）
+
+继承的优点在于：对实物按层次进行分类；对概念进行组合；支持软件的增量开发。
+
+
+
+\subsection{ C++提供几种继承方式？请列举派生类中继承自基类成员的各种访问控制。}
+
+C++有public private和protected三种继承方式。
+
+若采用public继承
+
+基类public->派生类public
+
+基类protected->派生类protected
+
+基类private->派生类不可直接使用
+
+若采用protected继承
+
+基类public->派生类protected
+
+基类protected->派生类protected
+
+基类private->派生类不可直接使用
+
+若采用private继承,基类的public protected 和private均不能直接使用。
+
+注意，以上的使用指的是派生类对象的调用和派生类的派生类对于基类成员的使用。在派生类中使用基类的成员，其访问控制与继承方式无关，与基类中原始的访问控制保持一致。
+
+
+\subsection{简述C++中转移构造函数与转移赋值函数的作用。}
+直接转移临时或即将消亡的对象占用的额外系统资源，提高使用临时或即将消亡的对象用于构造或赋值新的对象的效率。
+
+
+\section{编程题}
+\subsection{自动驾驶}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <iostream>
+    #include <cstdlib>
+    #include <ctime>
+    using std::cout;
+    using std::endl;
+    class Car
+    {
+    public:
+        // fRadian:方向盘旋转角度；fSpeed:汽车行驶速度
+        // fDeltaTime:每隔多久更新一次行驶状态
+        void drive(float fRadian, float fSpeed, float fDeltaTime)
+        {
+            cout << "Driving..." << endl;
+            cout << "Radian: " << fRadian << endl;
+            cout << "Speed: " << fSpeed << endl;
+            cout << "DeltaTime: " << fDeltaTime << endl;
+        }
+    };
+    
+    class AutopilotCar:public Car
+    {
+    public:
+        void autoDrive()
+        {
+            cout<<"autoDriving..."<<endl;
+        }
+    };
+    
+    
+    class UpgradedAutopilotCar:public AutopilotCar
+    {
+    public:
+        void optimizedDrive(float fRadian, float fSpeed, float fDeltaTime)
+        {
+            drive(fRadian+(int)rand()%5,fSpeed,fDeltaTime);
+        }
+    protected:
+        AutopilotCar::drive;
+    };
+    
+    class PerfectCar:private Car
+    {
+    public:
+        void autoDrive()
+        {
+            cout<<"autoDriving..."<<endl;
+        }
+    };
+ \end{lstlisting}
+
+\subsection{程序运行结果}
+我预期的运行结果是
+
+
+Base()
+
+A()
+
+Derive()
+
+$\sim$Derive()
+
+$\sim$A()
+
+$\sim$Base()
+
+Base()
+
+A()
+
+Derive()
+
+Base()
+
+A()
+
+Derive()
+
+Base()
+
+A()
+
+Derive(const Derive\&)
+
+Base()
+
+A()
+
+Derive(const Derive\&)
+
+$\sim$Derive()
+
+$\sim$A()
+
+$\sim$Base()
+
+$\sim$Derive()
+
+$\sim$A()
+
+$\sim$Base()
+
+Derive\& operator=(const Derive\& testDerive)
+
+$\sim$Derive()
+
+$\sim$A()
+
+$\sim$Base()
+
+$\sim$Derive()
+
+$\sim$A()
+
+$\sim$Base()
+
+但实际上并不是，查阅资料了解，g++会采取RVO优化，即使使用-o0编译也不能关闭RVO优化。RVO优化导致testFunc()在返回时不会调用拷贝构造函数生成临时变量，而是直接利用栈上已有的变量给赋值操作符重载函数传参。真实的运行结果如下。
+
+Base()
+
+A()
+
+Derive()
+
+$\sim$Derive()
+
+$\sim$A()
+
+$\sim$Base()
+
+Base()
+
+A()
+
+Derive()
+
+Base()
+
+A()
+
+Derive()
+
+Base()
+
+A()
+
+Derive(const Derive\&)
+
+$\sim$Derive()
+
+$\sim$A()
+
+$\sim$Base()
+
+Derive\& operator=(const Derive\& testDerive)
+
+$\sim$Derive()
+
+$\sim$A()
+
+$\sim$Base()
+
+$\sim$Derive()
+
+$\sim$A()
+
+$\sim$Base()
+
+想要取消RVO优化必须加 -fno-elide-constructors选项
+\end{document}
