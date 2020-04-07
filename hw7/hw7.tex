@@ -1,0 +1,253 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill \bf #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newcommand{\yahei}{\setCJKfamilyfont{yahei}{Microsoft YaHei} \CJKfamily{yahei}}
+
+
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+%大标题在这里改！！！！！！！！！
+\homework{实验报告}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+
+\section{概念题}
+\subsection{简述C++中虚函数的概念，并说明虚函数有哪些作用。}
+虚函数是指声明时增加了virtual关键词的成员函数，一方面可以实现消息的动态绑定，另一方面可以指出基类中可以被派生类重定义的成员函数
+\subsection{说明C++中静态绑定与动态绑定的区别，在哪些情况下会发生动态绑定？}
+静态绑定在编译时刻根据指针或引用的静态类型确定成员函数属于某个类，动态绑定在运行时刻根据指针或引用类型变量实际指向或引用的对象类型来确定成员函数属于某个类。
+
+只有通过基类的指针或引用访问基类的虚函数时才进行动态绑定。基类的构造函数、析构函数中对虚函数的调用不进行动态绑定。
+\subsection{简述C++中抽象类的概念及作用}
+抽象类是包含纯虚函数的类。抽象类的作用是为派生类提供一个基本框架和一个公共的对外接口。
+
+
+\section{编程题}
+\subsection{阅读代码}
+\subsubsection{}
+    我预测的输出结果是100$\backslash$n50$\backslash$n，实际输出结果与预测一致。
+\subsubsection{}
+    我预测的输出结果是5$\backslash$nE$\backslash$nE$\backslash$n5$\backslash$nE,实际输出结果与预测一致
+\subsection{Anmial}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <string>
+    #include <iostream>
+    using std::string;
+    using std::cout;
+    using std::endl;
+    
+    class Animal
+    {
+    public:
+        virtual void sound()=0;
+        void show();
+        Animal();
+        Animal(string name, double weight);
+    private:
+        string name;
+        double weight;
+    };
+    
+    
+    class Dog:public Animal
+    {
+    public:
+        Dog(string name, double weight)
+            : Animal(name,weight)
+        {        
+        }
+        void sound()
+        {
+            cout<< "woof woof woof!"<<endl;
+        }
+    };
+    
+    class Cat:public Animal
+    {
+    public:
+        Cat(string name, double weight)
+            : Animal(name,weight)
+        {        
+        }
+        void sound()
+        {
+            cout<< "mew~"<<endl;
+        }    
+    };
+    
+    class Cow:public Animal
+    {
+    public:
+        Cow(string name, double weight)
+            : Animal(name,weight)
+        {        
+        }
+        void sound()
+        {
+            cout<< "mooooooooo"<<endl;
+        }    
+    };
+    
+    void Animal::show()
+    {
+        cout<<"Name:"<<name<<endl;
+        cout<<"Weight:"<<weight<<endl;
+    }
+    
+    Animal::Animal(string n, double w)
+    {
+        name = n;
+        weight = w;
+    }
+    
+    Animal::Animal()
+    {
+        name = "Not initialized!";
+        weight = 0;    
+    }
+\end{lstlisting}
+\subsection{Student manager}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <iostream>
+    #include <string>
+    using std::cout;
+    using std::endl;
+    using std::string;
+    
+    enum {POLITICS,ENGLISH,SOFTWARE,ML};
+    
+    class Student
+    {
+    public:
+        Student(const string& name, double* scores);
+        virtual void score(double *score_list);
+        void display_name();
+    protected:
+        string name;
+        double politics;
+        double english;
+    };
+    
+    class ComputerStudent:public Student
+    {
+    public:
+        ComputerStudent(const string& name, double *scores);
+        void score(double *score_list);
+    protected:
+        double software;
+    };
+    
+    
+    class AIStudent:public ComputerStudent
+    {
+    public:
+        AIStudent(const string& name, double *scores);
+        void score(double *score_list);
+    protected:
+        double machine_learing;
+    };
+    
+    
+    Student::Student(const string& n, double *scores)
+    {
+        name = n;
+        politics = scores[POLITICS];
+        english = scores[ENGLISH];
+    }
+    
+    
+    void Student::display_name()
+    {
+        cout<<name<<endl;
+    }
+    
+    void Student::score(double *score_list)
+    {
+        score_list[0] = (english+politics)/2;
+        score_list[1] = score_list[0]/20;
+    }
+    
+    
+    ComputerStudent::ComputerStudent(const string& n, double *scores)
+        : Student(n,scores)
+    {
+        software =scores[SOFTWARE];
+    }
+    
+    void ComputerStudent::score(double *score_list)
+    {
+        Student::score(score_list);
+        score_list[0] = (score_list[0]*2+software)/3;
+        score_list[1] = software/20;
+    }
+    
+    AIStudent::AIStudent(const string& n, double *scores)
+        : ComputerStudent(n,scores)
+    {
+        machine_learing = scores[ML];
+    }
+    
+    
+    void AIStudent::score(double *score_list)
+    {
+        ComputerStudent::score(score_list);
+        score_list[0] = (score_list[0]*3+machine_learing)/4;
+        score_list[1] = machine_learing/20;
+    }
+    
+    
+    void display(Student* stu)
+    {
+        double scores_list[2]={0,0};
+        stu->display_name();
+        stu->score(scores_list);
+        cout<<"Average score:"<<scores_list[0]<<"GPA:"<<scores_list[1]<<endl;
+    }
+    
+\end{lstlisting}
+\end{document}

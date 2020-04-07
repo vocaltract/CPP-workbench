@@ -95,15 +95,3 @@ void display(Student* stu)
 }
 
 
-int main()
-{
-    double a_scores[] = {90,90,100};
-    double b_scores[] = {80,70};
-    double c_scores[] = {92,98,100,98};
-    Student b("Mike",b_scores);
-    ComputerStudent a("Jack",a_scores);
-    AIStudent c("Herry",c_scores);
-    display(&a);
-    display(&b);
-    display(&c);
-}
