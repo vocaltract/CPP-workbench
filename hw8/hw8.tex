@@ -1,0 +1,289 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill \bf #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newcommand{\yahei}{\setCJKfamilyfont{yahei}{Microsoft YaHei} \CJKfamily{yahei}}
+
+
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+%大标题在这里改！！！！！！！！！
+\homework{实验报告}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+
+\section{概念题}
+\subsection{分别简述C++中单继承和多继承的概念}
+    单继承指一个派生类只有一个直接基类。
+
+    多继承指一个派生类可以有两个或两个以上的直接基类。
+\subsection{说明C++代码复用中，继承和聚集这两种方式的区别？}
+    继承与封装存在矛盾，但集聚则没有。
+    继承可以实现子类型，但是具有集聚关系的两个类不具备子类型关系。
+\subsection{简述C++中虚基类的作用}
+    解决重复继承问题带来的空间浪费与冗余的一致性检查。
+
+
+\section{编程题}
+\subsection{阅读代码}
+    我预测的输出结果是
+
+    string1
+
+    string2
+
+    string3
+
+    string4
+
+    destructor of D
+
+    destructor of C
+
+    destructor of B
+
+    destructor of A
+    
+    实际输出结果与预测一致。
+\subsection{Phone}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <iostream>
+    #include <cstdio>
+    #include <Windows.h>
+    #include <cstring>
+    #include<time.h>
+    using std::cout;
+    using std::endl;
+    using std::cin;
+    #pragma warning(disable:4996)
+    class Screen
+    {
+    public:
+        void display(char* message, int len);
+        Screen(int l, int w);
+    private:
+        int length;
+        int width;
+    };
+    int code[200];
+    
+    class Mainboard
+    {
+    public:
+        Mainboard();
+        Mainboard(int d);
+        void encode(char* message, int* code, int len);
+        void decode(char* message, int* code, int len);
+        int decoding(char s);
+        int encoding(char s);
+    private:
+        int delay;
+    };
+    
+    class TestPhone
+    {
+    public:
+        TestPhone();
+        void sendMessage();
+        void sendMessage(char* message);
+        void receiveMessage();
+        void inputAndDisplay();
+        void inputAndDisplay(char* message);
+    protected:
+        Mainboard mainboard;
+        Screen screen;
+        int code_len;
+    };
+    
+    class ReleasePhone:public TestPhone
+    {
+    public:
+        void dateAndTime();
+    };
+    
+    Screen::Screen(int l, int w)
+    {
+        length = l;
+        width = w;
+    }
+    
+    void Screen::display(char* message, int len)
+    {
+        len--;
+        char* s = new char[width+1];
+        s[width] = '\0';
+        int outp_cont = len / width * width == len ? len / width : len / width + 1;
+        for (int i = 0; i < outp_cont; i++)
+        {
+            if (i % length == 0 && i >= length)
+            {
+                printf("\n");
+            }
+            if (i < outp_cont - 1)
+            {
+                strncpy(s, &message[i * width], width);
+                printf("%s\n", s);
+            }
+            else
+            {
+                strncpy(s, &message[i * width], len-i*width);
+                s[len - i * width] = '\0';
+                printf("%s", s);
+            }
+        }
+    }
+    
+    Mainboard::Mainboard()
+    {
+        delay = 0;
+    }
+    Mainboard::Mainboard(int d)
+    {
+        delay = d;
+    }
+    int Mainboard::encoding(char s)
+    {
+        if (s >= 'a' && s <= 'z')
+        {
+            return s - 'a';
+        }
+        if (s == ' ')
+        {
+            return 26;
+        }
+        if (s == '\0')
+        {
+            return -1;
+        }
+        return s;
+    }
+    
+    int Mainboard::decoding(char s)
+    {
+        if (s >= 0 && s <= 25)
+        {
+            return s + 'a';
+        }
+        if (s == 26)
+        {
+            return ' ';
+        }
+        if (s == -1)
+        {
+            return '\0';
+        }
+        return s;
+    }
+    
+    void Mainboard::encode(char* message, int* code, int len)
+    {
+        for (int i = 0;i < len; i++)
+        {
+            code[i] = encoding(message[i]);
+            Sleep(delay);
+        }
+    }
+    
+    void Mainboard::decode(char* message, int* code, int len)
+    {
+        for (int i = 0; i < len; i++)
+        {
+            message[i] = decoding(code[i]);
+            Sleep(delay);
+        }
+    }
+    
+    TestPhone::TestPhone()
+        :mainboard(1), screen(8,12)
+    {
+        code_len = 0;
+    }
+    
+    void TestPhone::sendMessage()
+    {
+        char s[200];
+        cin.get(s, 200);
+        code_len = strlen(s)+1;
+        mainboard.encode(s, code, code_len);
+    }
+    
+    void TestPhone::receiveMessage()
+    {
+        char s[200];
+        mainboard.decode(s, code, code_len);
+        screen.display(s, code_len);
+    }
+    
+    void TestPhone::inputAndDisplay()
+    {
+        sendMessage();
+        receiveMessage();
+    }
+    
+    void TestPhone::sendMessage(char* message)
+    {
+        code_len = strlen(message) + 1;
+        mainboard.encode(message, code, code_len);
+    }
+    
+    void TestPhone::inputAndDisplay(char* message)
+    {
+        sendMessage(message);
+        receiveMessage();
+    }
+    
+    void ReleasePhone::dateAndTime()
+    {
+        char system_time[200];
+        time_t now_time = time(NULL);
+        strcpy(system_time, asctime(localtime(&now_time)));
+        system_time[strlen(system_time) - 1] = '\0';
+        inputAndDisplay(system_time);
+    }
+\end{lstlisting}
+
+\end{document}
