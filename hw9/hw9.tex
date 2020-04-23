@@ -1,0 +1,389 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill \bf #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newcommand{\yahei}{\setCJKfamilyfont{yahei}{Microsoft YaHei} \CJKfamily{yahei}}
+
+
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+%大标题在这里改！！！！！！！！！
+\homework{实验报告}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+
+\section{概念题}
+\subsection{简述C++中类属的概念。}
+    一个程序实体能对多种类型的数据进行操作或描述的特性称为类属
+\subsection{C++提供了哪两种实现类属函数的机制?简述它们的缺点。}
+    \textbf{1}采用void* 类型的参数。
+    比较麻烦，需要大量的指针操作。
+    容易出错，编译程序无法进行类型检查。
+    \textbf{2}函数模板。
+    模板复用会产生相同的实例，需要额外处理。
+\subsection{简述C++中参数化多态的概念及作用。}
+    概念：一段带有类型参数的代码，给该参数提高不同类型就能得到多个不同的
+    代码，即一段代码有多种解释。
+    作用：实现源代码复用。
+
+\section{编程题}
+\subsection{Phone}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include<iostream>
+    using namespace std;
+    template <typename T>
+    void f(T){ cout<<"f(T)"<<endl; }
+    template <typename T>
+    void f(const T*){ cout<<"f(const T*)"<< endl; }
+    template <typename T>
+    void g(T){ cout<<"g(T)"<<endl; }
+    template <typename T>
+    void g(T*){ cout<<"g(T*)"<<endl; }
+    int main(){
+        int a=1;
+        int* b=&a;
+        const int c=0;
+        const int*d=&c;
+        f(a);//f(T) int
+        f(b);//f(T) int*
+        f(c);//f(T) const int
+        f(d);//f(const T*) int
+        g(a);//g(T) int
+        g(b);//g(T*) int
+        g(c);//g(T) const int
+        g(d);//g(T*) const int
+    }
+\end{lstlisting}
+\subsection{链表}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <iostream>
+    #include <string>
+    using namespace std;
+    template <class T> 
+    class Node
+    {
+    public:
+        Node(){next=NULL;}
+        T& val(){return value;}
+        Node*& pnext(){return next;}
+    private:
+        T value;
+        Node *next;
+    };
+    
+    template<class T>
+    class List
+    {
+    public:
+        List()
+        {
+            head=NULL;
+            tail=NULL;
+        }
+        ~List()
+        {
+            Node<T> *tmp =head;
+            if(!tmp)
+            {
+                Node<T> *tmp2=tmp;
+                tmp = tmp->pnext();
+                delete tmp2;
+            }
+        }
+        void add(T val)
+        {
+            if(head!=NULL)
+            {
+                tail->pnext() = new Node<T>;
+                tail->pnext()->val()=val;
+                tail = tail->pnext();
+            }
+            else
+            {
+                tail = new Node<T>;
+                tail->val()=val;
+                head=tail;   
+            }
+        }
+        void display()
+        {
+            if(head!=NULL)
+            {
+                Node<T> *tmp = head;
+                while(tmp!=NULL)
+                {
+                    cout<<tmp->val()<<" ";
+                    tmp = tmp->pnext();
+                }
+            }
+            
+        }
+    
+    private:
+        Node<T> *head,*tail;
+    };
+    
+    int main()
+    {
+        List<int> mylist;
+        mylist.add(21);
+        mylist.add(12);
+        mylist.display();
+        cout<<endl;
+        List<double> mylist2;
+        mylist2.add(1.2);
+        mylist2.add(2.1);
+        mylist2.display();
+        cout<<endl;
+        List<string> mylist3;
+        mylist3.add("abd");
+        mylist3.add("adadada");
+        mylist3.display();
+    }
+\end{lstlisting}
+\subsection{矩阵}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <iostream>
+    #include <cassert>
+    using namespace std;
+    template <class T> class Matrix
+    {
+    public:
+        Matrix(int m, int n)
+        {
+            row = m;
+            col = n;
+            all = new T*[m];
+            for(int i=0;i<m;i++)
+            {
+                all[i] = new T[n];
+            }
+        }
+        ~Matrix()
+        {
+            for(int i=0;i<row;i++)
+            {
+                delete[] all[i];
+            }
+            delete[] all;
+        }
+    
+        Matrix(const Matrix& mat)
+        {
+            row = mat.row;
+            col = mat.col;
+            all = new T*[row];
+            for(int i=0;i<row;i++)
+            {
+                all[i] = new T[col];
+            }        
+            for(int i=0;i<row;i++)
+            {
+                for(int j=0;j<col;j++)
+                {
+                    all[i][j]=mat.all[i][j];
+                }
+            }       
+        }
+        Matrix& operator= (const Matrix& mat)
+        {
+            assert(row==mat.row && col==mat.col);
+            if(this==*mat) return *this;
+            for(int i=0;i<row;i++)
+            {
+                for(int j=0;j<col;j++)
+                {
+                    all[i][j]=mat.all[i][j];
+                }
+            }
+        }
+        void display()
+        {
+            for(int i=0;i<row;i++)
+            {
+                for(int j=0;j<col;j++)
+                {
+                    cout<<all[i][j]<<" ";
+                }
+                cout<<endl;
+            }        
+        }
+        void transpose()
+        {
+            T** new_all= new T*[col];
+            for(int i=0;i<col;i++)
+            {
+                new_all[i] = new T[row];
+            }
+            for(int i=0;i<row;i++)
+            {
+                for(int j=0;j<col;j++)
+                {
+                    new_all[j][i]=all[i][j];
+                }
+            }                 
+            for(int i=0;i<row;i++)
+            {
+                delete[] all[i];
+            }
+            delete[] all;
+            all = new_all;
+            int tmp = row;
+            row = col;
+            col = tmp;
+        }
+        void setMatrix()
+        {
+            for(int i=0;i<row;i++)
+            {
+                for(int j=0;j<col;j++)
+                {
+                    cin>>all[i][j];
+                }
+            }            
+        }
+        void debug()
+        {
+            cout<<"row:"<<row<<"col:"<<col<<endl;
+        }
+    
+    
+        Matrix operator+(const Matrix &mat)
+        {
+            Matrix res(*this);
+            for(int i=0;i<row;i++)
+            {
+                for(int j=0;j<col;j++)
+                {
+                    res.all[i][j]=mat.all[i][j]+all[i][j];
+                }
+            }    
+            return res;
+        }
+        Matrix operator*(const Matrix &mat)
+        {
+            assert(col==mat.row);
+            Matrix res(row, mat.col);
+            for(int i=0;i<row;i++)
+            {
+                for(int j=0;j<mat.col;j++)
+                {
+                    T sum;
+                    for(int k=0;k<mat.row;k++)
+                    {
+                        if(!k)
+                        {
+                            sum = all[i][k]*mat.get(k,j);
+                        }
+                        else
+                        {
+                            sum+= all[i][k]*mat.get(k,j);
+                        }
+                    }
+                    res.get(i,j)=sum;
+                }
+            }
+            return res;
+        }
+        void square()
+        {
+            Matrix<T> copy(*this);
+            copy.transpose();
+            Matrix<T>res = *this * copy;
+            res.display();
+    
+        }
+        T& get(int i, int j)
+        {
+            assert(i<row&&j<col);
+            return all[i][j];
+        }
+        T get(int i, int j) const
+        {
+            assert(i<row&&j<col);
+            return all[i][j];        
+        }
+    
+    
+    
+    private:
+        T** all;
+        int row,col;
+    };
+    
+    
+    
+    int main()
+    {
+    #ifdef TEST1
+        Matrix<int> matrix1(2,3);
+        matrix1.setMatrix();
+        matrix1.display();
+        matrix1.transpose();
+        matrix1.display();
+        Matrix<int> matrix2(matrix1);
+        matrix2.transpose();
+        matrix2.display();
+    
+    #else
+    
+        Matrix<double> matrix1(2,3);
+        matrix1.setMatrix();
+        matrix1.display();
+        Matrix<double> matrix2(2,2);
+        matrix2.setMatrix();
+        matrix2.square();
+        Matrix<double> matrix3(2,3);
+        matrix3.setMatrix();
+        (matrix1+matrix3).display();
+    #endif
+    
+    }
+    
+\end{lstlisting}
+
+\end{document}
