@@ -1,0 +1,404 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill \bf #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newcommand{\yahei}{\setCJKfamilyfont{yahei}{Microsoft YaHei} \CJKfamily{yahei}}
+
+
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+%大标题在这里改！！！！！！！！！
+\homework{实验报告}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+
+\section{概念题}
+\subsection{C++的STL提供了哪几种模板？分别简述它们的作用}
+    提供了三种模板：容器模板、算法模板和迭代器模板。
+    容器用于存储数据，迭代器用于访问容器中的元素，算法用于操作容器中的元素。
+\subsection{列举STL中能快速定位（访问）任意位置的容器，并说明它们的内部数据结构。}
+\subsubsection{vector}
+动态数组
+\subsubsection{deque}
+分段的连续空间
+\subsubsection{map,multimap}
+某种二叉树
+\subsubsection{set,multiset}
+某种二叉树
+\subsection{简述C++中自定义操作条件（谓词）的概念及作用。}
+    参数为元素类型，返回值为bool的函数或函数对象。作为STL中算法的操作条件。
+
+\section{编程题}
+\subsection{代码补全}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <iostream>
+    #include <string>
+    using std::string;
+    class StrOperation
+    {
+    private:
+        string str;
+    public:
+        StrOperation(string s);
+        bool judgePalindrome();
+        void insertStr(int i,string s);
+        void replaceStr(int be,int en,string s);
+    };
+    
+    StrOperation::StrOperation(string s)
+    {
+        str = s;
+    }
+    bool StrOperation::judgePalindrome()
+    {
+        string::const_iterator be = str.begin(),ed = str.end();
+        ed--;
+        while(be!=ed&&be!=ed+1)
+        {
+            if(*be!=*ed)
+            {
+                return false;
+            }
+            be++;
+            ed--;
+        }
+        return true;
+    }
+    void StrOperation::insertStr(int i,string s)
+    {
+        str.insert(i,s);
+    }
+    void StrOperation::replaceStr(int be,int en,string s)
+    {
+        str.replace(be,en,s);
+    }
+    
+\end{lstlisting}
+\subsection{动物管理}
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <iostream>
+    #include <string>
+    #include <map>
+    using std::endl;
+    using std::cout;
+    using std::map;
+    using std::string;
+    class System
+    {
+    public:
+        System();
+        void record(string name, int num);
+        void del(string name);
+        int animal_num(string name);
+        int _kinds();
+        int _total();
+    private:
+        map<string,int> animals;
+        int kinds_of_animals;
+        int total;
+    };
+    
+    System::System()
+    {
+        kinds_of_animals=0;
+        total=0;
+    }
+    void System::record(string name, int num)
+    {
+        map<string,int>::iterator it = animals.find(name);
+        cout<<"Record successfully!";
+        if(it!=animals.end())
+        {
+            animals[name] += num;
+            cout<<"Existed before."<<endl;
+        }
+        else
+        {
+            animals[name] = num;   
+            cout<<"Not Existed before."<<endl;
+            kinds_of_animals++;
+        }
+        total+=num;
+    }
+    void System::del(string name)
+    {
+        map<string,int>::iterator it = animals.find(name);
+        if(it!=animals.end())
+        {
+            total -= animals[name];
+            kinds_of_animals--;
+            animals.erase(name); 
+            cout<<"Delete successfully"<<endl;
+        }
+        else
+        {
+            cout<<"Deletion failed!Not Existed"<<endl;
+        }
+        // if(animals.erase(name)) cout<<"Delete Successfully"<<endl;
+        // else cout<<"Delete Failed! Animal not exists."<<endl;
+    }
+    
+    int System::animal_num(string name)
+    {
+        map<string, int>::const_iterator it = animals.find(name);
+        if(it!=animals.end())
+        {
+            return animals[name];
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    
+    int System::_kinds()
+    {
+        return kinds_of_animals;
+    }
+    int System::_total()
+    {
+        return total;
+    }
+    
+\end{lstlisting}
+\subsection{图书管理}
+    实践发现，使用deque速度远快于vector，deque通过测试需要0.003071秒，而vector需要0.007055秒。
+
+\begin{lstlisting}[language={[ANSI]C++}]
+    #include <iostream>
+    #include <string>
+    #include <list>
+    #include <stack>
+    #include <map>
+    #include <vector>
+    #include <cassert>
+    #include <algorithm>
+    #include <cstdlib>
+    #include <ctime>
+    using namespace std;
+    #define ADT deque
+    class Book
+    {
+    public:
+        Book(string name, string author,int year, int ID, int num);
+        int get_num() const; 
+        int get_ID() const;
+        int get_year() const;
+        void display() const;
+        void display_year() const;
+        const string& get_author() const;   
+    private:
+        string _name,_author;
+        int _year;
+        int _ID;
+        int _num;
+    };
+    Book::Book(string name, string author,int year, int ID, int num)
+    {
+        _name = name;
+        _author = author;
+        _year = year;
+        _ID = ID;
+        _num = num;
+    }
+    int Book::get_num() const
+    {
+        return _num;
+    }
+    int Book::get_ID() const
+    {
+        return _ID;
+    }  
+    
+    const string& Book::get_author() const
+    {
+        return _author;
+    }
+    void Book::display() const
+    {
+        cout<<"author:"<<_author<<" book name:"<<_name<<" num:"<<_num;
+        cout<<" year:"<<_year<<" ID:"<<_ID<<endl;
+    }
+    int Book::get_year() const
+    {
+        return _year;
+    }
+    void Book::display_year() const
+    {
+        cout<<"Year:"<<_year<<endl;
+    }
+    
+    class MatchAuthor
+    {
+    public:
+        MatchAuthor(const string& author)
+        {
+            _author = author;
+        }
+        void operator()( Book& bk)
+        {
+            if(bk.get_author()==_author)
+            {
+                bk.display();
+            }
+        }
+    private:
+        string _author;
+    };
+    
+    bool cmp_year(Book& bk1,Book bk2)
+    {
+        return bk1.get_year()>bk2.get_year();
+    }
+    
+    void display(Book& bk)
+    {
+        bk.display();
+    }
+    
+    class Machine
+    {
+    public:
+        Machine();
+        void addBook(int num,const string& name,const string& author,int year);
+        void deleteBook(int ID);
+        int _getID();
+        void display_with_year();
+        void find(const string& author);
+        void _freeID(int id);
+    private:
+        ADT<Book> books;
+        stack<int> available_IDs;//书被删除后重新加入需要新的ID
+        int max_id;
+    };
+    Machine::Machine()
+    {
+        max_id=-1;
+    }
+    void Machine::deleteBook(int ID)
+    {
+        ADT<Book>::const_iterator it = books.begin();
+        while(it!=books.end())
+        {
+            if((it->get_ID())==ID)
+            {
+                books.erase(it);
+                _freeID(ID);
+                return;
+            }
+            it++;
+        }
+        cout<<"No this book!"<<endl;
+    }
+    
+    void Machine::find(const string& author)
+    {
+        for_each(books.begin(),books.end(),MatchAuthor(author));
+    }
+    
+    void Machine::display_with_year()
+    {
+        sort(books.begin(),books.end(),cmp_year);
+        for_each(books.begin(),books.end(),display);
+    }
+    
+    void Machine::addBook(int num,const string& name,const string& author,int year)
+    {
+        books.push_back((Book){name,author,year,_getID(),num});
+    }
+    
+    
+    int Machine::_getID()
+    {
+        if(available_IDs.empty())
+        {
+            max_id++;
+            return max_id;
+        }
+        int tmp = available_IDs.top();
+        available_IDs.pop();
+        return tmp;
+    }
+    void Machine::_freeID(int id)
+    {
+        available_IDs.push(id);
+    }
+    
+    
+    
+    
+    int main()
+    {
+        Machine my_library;
+        clock_t st=clock();
+        for(int i=0;i<120;i++)
+        {
+            my_library.addBook(i,"test","Dad",i+100);
+            my_library.addBook(i,"see","wang",123);
+            my_library.addBook(i,"Pig","Chen",11);
+        } 
+        for(int i=0;i<50;i++)
+        {
+            my_library.deleteBook(i);
+        }
+        for(int i=0;i<10;i++)
+        {
+            my_library.addBook(i,"test2","Kitty",10);
+            my_library.addBook(i,"see2","wang",123);
+            my_library.addBook(i,"Pig2","Chen",11);
+        }
+            for(int i=100;i<120;i++)
+        {
+            my_library.deleteBook(i);
+        } 
+        my_library.find("Chen");
+        my_library.display_with_year();
+        cout<<"Time consumption:"<<(double)(clock()-st)/CLOCKS_PER_SEC<<endl;
+    }
+\end{lstlisting}
+
+\end{document}

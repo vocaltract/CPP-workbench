@@ -1,0 +1,110 @@
+\documentclass[UTF8]{ctexart}
+%\documentclass[a4paper]{article}
+% \usepackage[margin=1.25in]{geometry}
+\usepackage[inner=2.0cm,outer=2.0cm,top=2.5cm,bottom=2.5cm]{geometry}
+%\usepackage{CJK}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\newcommand{\homework}[5]{
+    \pagestyle{myheadings}
+    \thispagestyle{plain}
+    \newpage
+    \setcounter{page}{1}
+    \noindent
+    \begin{center}
+    \framebox{
+        \vbox{\vspace{2mm}
+        \hbox to 6.28in { {\bf 高级程序设计 \hfill #2} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\Large \hfill \bf #1 \hfill} }
+        \vspace{6mm}
+        \hbox to 6.28in { {\it 指导老师： {\rm #3} \hfill 姓名： {\rm #4},学号： {\rm #5}}}
+        \vspace{2mm}}
+    }
+    \end{center}
+    % \markboth{#4 -- #1}{#4 -- #1}
+    \vspace*{4mm}
+}
+
+
+\newcommand{\yahei}{\setCJKfamilyfont{yahei}{Microsoft YaHei} \CJKfamily{yahei}}
+
+
+
+
+\newenvironment{solution}
+{\color{blue} \paragraph{Solution.}}
+{\newline \qed}
+
+\begin{document}
+
+
+%大标题在这里改！！！！！！！！！
+\homework{课程设计2}{2020 春}{陈家骏\phantom{ }黄书剑}{王晨渊}{181220057}
+
+\lstset{numbers=left,numberstyle=\tiny,keywordstyle=\color{blue!70},commentstyle=\color{red!50!green!50!blue!50},frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``,xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
+\section{编译运行环境}
+    使用了VS2019进行编译运行。请将windows控制台放大到最大以改善使用体验。
+
+\section{操作与规则}
+\subsection{操作}
+    仅实现了基本要求。玩家出生在屏幕下方。
+    WASD操控移动，J发射炮弹。
+\subsection{规则}
+    每击杀一辆坦克积1分，
+    敌人的内讧击杀同样积1分。
+    玩家共两条生命。
+
+    共3辆敌军坦克。
+    轻型坦克生命为1，速度为3，为蓝色。中型坦克生命为2，速度为2，为红色。重型坦克生命为3，速度为1，为绿色。玩家为轻型坦克。
+
+    每一点生命可以承受一发炮弹，生命规律后死亡。
+
+    屏幕下发红色星星为基地，任意炮弹命中星星会导致游戏失败。
+
+    胜利条件为所有敌人死亡。失败条件为基地被击中或玩家控制的坦克生命为0。
+
+\section{设计思路}
+\subsection{核心思路}
+    本质上，程序中有一个画板，画板中的每个像素点都存储了对应的属性信息。所谓的tank 炮弹等等只是一个个管理员，用于管理对应的一些像素点。游戏的交互本质上是这些管理员的交互。
+\subsection{代码结构}
+    common中定义了项目中所有需要的宏和一些全局变量，此外包括了一些特殊函数的实现，如将输入映射到UP等宏的映射函数。
+
+    Screen类型对象实现输入、交互、更新功能。敌人的行为利用随机数，复用Screen的输入模块实现。Screen的成员对象包括子弹管理类(Bullets),item*指针等等。
+
+    Bullet, Tank都继承Item类型。Item是一个纯虚类。由于设计的失误，他们对应的方向等等信息接口实际上并不完全相容。为了保证编译通过，因此编写了一些冗余代码。
+
+    Bullets是Bullet类型对象的管理员，将系统中可能的所有bullet类型对象都设置为其成员对象。
+
+    Vector2D类是坐标类型的一个包装，直接复用了上次贪吃蛇的设计。
+
+    Block是像素点，保存了单个像素的信息，如颜色、类型等。自认为一个比较脏的设计是，像素的信息中，包含了一个指针，用于指向管理这个像素的管理员。这样明显破坏了数据的封装，但是实际上带来了极大的便捷，可以迅速索引到对应的管理员从而完成一些更新。
+
+    LightTank,MediumTank,HeavyTank仅仅是对Tank的一些成员的信息进行了修改，如修改速度、血量。虽然继承自Tank，但是实际上没有本质区别。
+
+
+    游戏的进行采取了传统的批处理系统的模式，以Sreen为核心进行。print\_text和print\_graphic是真实的输出函数，用于输出图像和游戏的统计信息。
+
+\section{尚未解决的问题}
+\subsection{虚基类设置不合理}
+    Item作为虚基类，其两个派生类bullet和tank需要的接口明显不同，同时程序中所有的指针都是Item*，直接导致了程序中塞了很多的无意义代码用来保证编译通过。
+    解决办法是彻底重构调整结构，同样由于时间问题没有进行。
+\subsection{"画板"设置不合理}
+    画板数组应当直接设置为全局变量，而非私有成员。设置不合理导致程序中存储了大量完全一样的画板指针，造成了极大的信息冗余。由于时间来不及，没有进行优化。
+
+\subsection{刷新速率过慢，有明显屏闪}
+    我通过关闭cout的与stdio的协同来加快速度，但是很遗憾问题没有完全解决。我认为可能需要一些移动光标的库函数，仅刷新改变的部分才有效。但是由于时间有限没有更新。    
+
+\end{document}
